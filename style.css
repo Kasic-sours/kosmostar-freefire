@@ -143,3 +143,22 @@ header {
     color: #f0f0f0;
     border-bottom: 2px solid #ff2e63;
 }
+.telegram {
+    text-align: center;
+    margin: 40px auto;
+}
+
+.tg-button {
+    display: inline-block;
+    background-color: #229ED9;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 18px;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.tg-button:hover {
+    background-color: #1a8bb8;
+}
