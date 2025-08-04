@@ -1,56 +1,250 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>KOSMOSTAR — Free Fire Гильдия</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<title>KOSMOSTAR — Free Fire Гильдия</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+<style>
+/* Минимальные стили для кнопки Вход в меню, чтобы не ломать дизайн */
+nav ul li button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  font-size: 1em;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+nav ul li button:hover {
+  color: #FFD700; /* золотой цвет при наведении */
+}
+
+/* Модальное окно */
+#authModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+#authModal.active {
+  display: flex;
+}
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 0 10px #0003;
+  font-family: Arial, sans-serif;
+  position: relative;
+}
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-align: center;
+}
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.modal-content button.auth-action {
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+  font-weight: 600;
+  border: none;
+  border-radius: 5px;
+  background-color: #0057ff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.modal-content button.auth-action:hover {
+  background-color: #003bb5;
+}
+.modal-content .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+.modal-content .close-btn:hover {
+  color: #000;
+}
+.error-message {
+  color: red;
+  font-size: 13px;
+  min-height: 18px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+</style>
+
 </head>
 <body>
-    <nav>
-    <ul>
-        <li><a href="index.html">🏠 Главная</a></li>
-        <li><a href="players.html">👥 Игроки</a></li>
-        <li><a href="gallery.html">🖼️ Галерея</a></li>
-        <li><a href="join.html">✍️ Вступить</a></li>
-    </ul>
+
+<nav>
+  <ul>
+    <li><a href="index.html">🏠 Главная</a></li>
+    <li><a href="players.html">👥 Игроки</a></li>
+    <li><a href="gallery.html">🖼️ Галерея</a></li>
+    <li><a href="join.html">✍️ Вступить</a></li>
+    <li><a href="chat.html">💬 Чат</a></li>
+    <li><a href="stream.html">🔴 Стрим</a></li>
+    <li><button id="openAuthBtn">Вход</button></li>
+  </ul>
 </nav>
-    <header>
-        <h1>KOSMOSTAR</h1>
-        <p class="slogan">Набор в дружную гильдию открыт!</p>
-    </header>
 
-    <main>
-        <section class="intro">
-            <h2>Приветствуем, бойцы!</h2>
-            <p>
-                Добро пожаловать на официальный сайт гильдии <strong>KOSMOSTAR</strong>!
-                Сейчас открыт набор в нашу команду — мы ищем активных и дружелюбных игроков.
-            </p>
-            <p>
-                Мы играем с 2019 года, и наша цель — вырастить новое поколение бойцов,
-                объединённых дружбой, честной игрой и желанием побеждать.
-            </p>
-        </section>
+<header>
+  <h1>KOSMOSTAR</h1>
+  <p class="slogan">Набор в дружную гильдию открыт!</p>
+</header>
 
-        <section class="about">
-            <h2>О гильдии</h2>
-            <ul>
-                <li>🎯 Стиль игры: общение, турниры, рост вместе</li>
-                <li>🤝 Дружный коллектив</li>
-                <li>🎮 Опыт с 2019 года</li>
-                <li>📢 Поддержка новичков и активных игроков</li>
-            </ul>
-        </section>
+<main>
+  <section class="intro">
+    <h2>Приветствуем, бойцы!</h2>
+    <p>Добро пожаловать на официальный сайт гильдии <strong>KOSMOSTAR</strong>!</p>
+    <p>Сейчас открыт набор в нашу команду — мы ищем активных и дружелюбных игроков.</p>
+    <p>Мы играем с 2019 года, и наша цель — вырастить новое поколение бойцов, объединённых дружбой, честной игрой и желанием побеждать.</p>
+  </section>
 
-        <section class="contacts">
-            <h2>Контакты</h2>
-            <p>📱 Наш <a href="https://t.me/your_telegram_link" target="_blank">Telegram</a></p>
-            <p>📘 Наш <a href="https://vk.com/your_vk_link" target="_blank">ВКонтакте</a></p>
-        </section>
-    </main>
+  <section class="about">
+    <h2>О гильдии</h2>
+    <ul>
+      <li>🎯 Стиль игры: общение, турниры, рост вместе</li>
+      <li>🤝 Дружный коллектив</li>
+      <li>🎮 Опыт с 2019 года</li>
+      <li>📢 Поддержка новичков и активных игроков</li>
+    </ul>
+  </section>
 
-    <footer>
-        <p>&copy; 2025 KOSMOSTAR. Все права защищены.</p>
-    </footer>
+  <section class="contacts">
+    <h2>Контакты</h2>
+    <p>📱 Наш <a href="https://t.me/your_telegram_link" target="_blank">Telegram</a></p>
+    <p>📘 Наш <a href="https://vk.com/your_vk_link" target="_blank">ВКонтакте</a></p>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2025 KOSMOSTAR. Все права защищены.</p>
+</footer>
+
+<!-- Модальное окно для входа -->
+<div id="authModal">
+  <div class="modal-content">
+    <button class="close-btn" id="closeAuthBtn">&times;</button>
+    <h2>Вход / Регистрация</h2>
+    <div class="error-message" id="errorMsg"></div>
+    <input type="email" id="emailInput" placeholder="Email" />
+    <input type="password" id="passwordInput" placeholder="Пароль" />
+    <button class="auth-action" id="signUpBtn">Зарегистрироваться</button>
+    <button class="auth-action" id="signInBtn">Войти</button>
+    <hr />
+    <button class="auth-action" id="googleSignInBtn">Войти через Google</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const firebaseConfig = {
+    apiKey: "AIzaSyCEuQ0e68vtnlncSF0szRw3sx8H_c5JtXA",
+    authDomain: "kosmostar-auth.firebaseapp.com",
+    projectId: "kosmostar-auth",
+     storageBucket: "kosmostar-auth.firebasestorage.app",
+     messagingSenderId: "364152131416",
+     appId: "1:364152131416:web:343964c346664e960cdf2d",
+     measurementId: "G-ELQRH74GB6"
+    // остальные параметры, если нужны
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  const authModal = document.getElementById('authModal');
+  const openAuthBtn = document.getElementById('openAuthBtn');
+  const closeAuthBtn = document.getElementById('closeAuthBtn');
+  const errorMsg = document.getElementById('errorMsg');
+
+  openAuthBtn.addEventListener('click', () => {
+    errorMsg.textContent = '';
+    authModal.classList.add('active');
+  });
+
+  closeAuthBtn.addEventListener('click', () => {
+    authModal.classList.remove('active');
+  });
+
+  document.getElementById('signUpBtn').addEventListener('click', () => {
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    errorMsg.textContent = '';
+
+    if (!email || !password) {
+      errorMsg.textContent = 'Пожалуйста, заполните email и пароль.';
+      return;
+    }
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        alert(`Добро пожаловать, ${userCredential.user.email}!`);
+        authModal.classList.remove('active');
+      })
+      .catch(error => {
+        errorMsg.textContent = error.message;
+      });
+  });
+
+  document.getElementById('signInBtn').addEventListener('click', () => {
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    errorMsg.textContent = '';
+
+    if (!email || !password) {
+      errorMsg.textContent = 'Пожалуйста, заполните email и пароль.';
+      return;
+    }
+
+    auth.signInWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        alert(`Вы вошли как ${userCredential.user.email}`);
+        authModal.classList.remove('active');
+      })
+      .catch(error => {
+        errorMsg.textContent = error.message;
+      });
+  });
+
+  document.getElementById('googleSignInBtn').addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+      .then(result => {
+        alert(`Вы вошли как ${result.user.email}`);
+        authModal.classList.remove('active');
+      })
+      .catch(error => {
+        errorMsg.textContent = error.message;
+      });
+  });
+});
+</script>
+
 </body>
 </html>
